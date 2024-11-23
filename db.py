@@ -1,6 +1,7 @@
 import sqlite3
 from contextlib import closing
 
+
 def create_table():
     try:
 
@@ -22,7 +23,6 @@ def create_table():
                 )
 
                 conn.commit()
-
 
     except Exception as ex:
         print(ex)

@@ -1,6 +1,7 @@
 import sys
 import sql
 import db
+import os.path
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QTableWidgetItem
 from mainwindow import Ui_Form
@@ -55,7 +56,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Form):
     def search_tasks(self):
         """Поиск задач"""
         search_string: str = self.lineEdit_5.text()
-        tasks: list = sql.Tasks.search_task(search_string)
+        task_key: str = self.comboBox_2.currentText()
+        if task_key == "По всем":
+            tasks: list = sql.Tasks.search_task(search_string)
+        else:
+            tasks: list = sql.Tasks.search_task(search_string, task_key)
 
         rows: int = len(tasks)
 
@@ -97,7 +102,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Form):
 
 if __name__ == "__main__":
 
-    db.create_table()
+    if not os.path.exists("./tasks.db"):
+        db.create_table()
 
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()

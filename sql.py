@@ -74,11 +74,15 @@ class Tasks:
         except Exception as ex:
             return f"Ошибка:{ex}"
 
-    def search_task(search_string):
+    def search_task(search_string: str, task_key: str = ''):
+
+        if len(task_key) == 0:
+            task_key = 'id || name || description ||\
+                priority || create_time || deadline'
+
 
         sql_query = f'select * from tasks where \
-            id || name || description || priority || create_time || deadline \
-                like "%{search_string}%"'
+            {task_key} like "%{search_string}%"'
 
         try:
             with closing(sqlite3.connect(Tasks.db_path)) as conn:

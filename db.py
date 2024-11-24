@@ -21,7 +21,15 @@ def create_table():
                 )
                 """
                 )
+                conn.commit()
 
+        with closing(sqlite3.connect("tasks.db")) as conn:
+            with closing(conn.cursor()) as cursor:
+                
+                print(cursor.execute(
+                "UPDATE SQLITE_SEQUENCE SET seq = 1000 WHERE name = 'tasks'"
+                ))
+                
                 conn.commit()
 
     except Exception as ex:

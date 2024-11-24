@@ -22,16 +22,26 @@ class Tasks:
     def create_task(name: str,
                     priority: int,
                     description: str,
-                    deadline: datetime):
+                    deadline: datetime) -> str:
+        """Создает задачу
 
+        Args:
+            name (str): Имя задачи
+            priority (int): Приоритет
+            description (str): Описание
+            deadline (datatime): Срок
+
+        Returns:
+            str: статус выполнения
+        """
         create_time: datetime = datetime.now().strftime("%d-%m-%Y %H:%M")
         status: int = 1
 
-        sql_query = """INSERT INTO tasks\
+        sql_query: str = """INSERT INTO tasks\
             (name,description,priority,status,create_time,deadline) \
                 VALUES(?,?,?,?,?,?)"""
         try:
-            priority = int(priority)
+            priority: int = int(priority)
 
             if priority not in range(1, 4):
                 raise IndexError("Приоритет должен быть от 1 до 3")
@@ -42,13 +52,15 @@ class Tasks:
             return f"Ошибка:{ex}"
 
         if len(deadline) == 0:
-            deadline = "NULL"
+            deadline: str = "NULL"
         else:
             try:
-                deadline = datetime.strptime(deadline,
-                                             "%d-%m-%Y %H:%M"
-                                             ).strftime(
-                                                 "%d-%m-%Y %H:%M")
+                deadline: datetime = datetime.strptime(
+                    deadline,
+                    "%d-%m-%Y %H:%M"
+                    ).strftime(
+                    "%d-%m-%Y %H:%M"
+                    )
 
             except Exception:
                 return "Ошибка: Неверная дата"
@@ -56,7 +68,7 @@ class Tasks:
         try:
             with closing(sqlite3.connect(Tasks.db_path)) as conn:
                 with closing(conn.cursor()) as cursor:
-                    data = (
+                    data: tuple = (
                         name,
                         description,
                         priority,
@@ -75,28 +87,45 @@ class Tasks:
             return f"Ошибка:{ex}"
 
     def search_task(search_string: str, task_key: str = ''):
+        """поиск задач в БД
 
+        Args:
+            search_string (str): строка поиска
+            task_key (str): ключ. По умолчанию ''.
+
+        Returns:
+            list: Список задач
+        """
         if len(task_key) == 0:
-            task_key = 'id || name || description ||\
+            task_key: str = 'id || name || description ||\
                 priority || create_time || deadline'
 
-
-        sql_query = f'select * from tasks where \
+        sql_query: str = f'select * from tasks where \
             {task_key} like "%{search_string}%"'
 
         try:
             with closing(sqlite3.connect(Tasks.db_path)) as conn:
                 with closing(conn.cursor()) as cursor:
 
-                    query = cursor.execute(sql_query)
+                    query: str = cursor.execute(sql_query)
                     return query.fetchall()
 
         except Exception as ex:
             return f"Ошибка:{ex}"
 
-    def delete_task(index_to_delete):
+    def delete_task(index_to_delete: int) -> str:
+        """Удаляет задачи по индексу
 
-        sql_query = f"DELETE FROM tasks WHERE id = {index_to_delete}"
+        Args:
+            index_to_delete (int): Индекс
+
+        Raises:
+            IndexError: Ошибка индекса
+
+        Returns:
+            str: статус
+        """
+        sql_query: str = f"DELETE FROM tasks WHERE id = {index_to_delete}"
 
         try:
             with closing(sqlite3.connect(Tasks.db_path)) as conn:
@@ -121,23 +150,35 @@ class Tasks:
         except Exception as ex:
             return f"Ошибка:{ex}"
 
-    def update_task(task_index, task_key, new_value):
+    def update_task(task_index: int, task_key: str, new_value: str) -> str:
+        """Обновление задачи
 
+        Args:
+            task_index (int): Индекс
+            task_key (str): Ключ
+            new_value (str): Новое значение
+
+        Raises:
+            IndexError: Ошибка индекса
+
+        Returns:
+            str: статус
+        """
         try:
             if task_key == "Priority":
-                new_value = int(new_value)
+                new_value: int = int(new_value)
                 if new_value not in range(1, 4):
                     raise IndexError("Приоритет должен быть от 1 до 3")
                 else:
-                    new_value = Tasks.priority_dict[new_value]
+                    new_value: int = Tasks.priority_dict[new_value]
 
             elif task_key == "Status":
-                new_value = int(new_value)
-                new_value = Tasks.status_dict[new_value]
+                new_value: int = int(new_value)
+                new_value: int = Tasks.status_dict[new_value]
         except Exception as ex:
             return f"Ошибка:{ex}"
 
-        sql_query = (
+        sql_query: str = (
             f'UPDATE tasks SET "{task_key}" = "{new_value}"\
             WHERE id = {task_index}'
         )

@@ -2,10 +2,15 @@ import sqlite3
 from contextlib import closing
 
 
-def create_table():
+def create_table(dbname: str = "tasks.db"):
+    """Создает базу данных и таблицу
+
+    dbname (str): Имя бд. По умолчанию "tasks"
+
+    """
     try:
 
-        with closing(sqlite3.connect("tasks.db")) as conn:
+        with closing(sqlite3.connect(dbname)) as conn:
             with closing(conn.cursor()) as cursor:
 
                 cursor.execute(
